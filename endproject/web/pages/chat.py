@@ -42,7 +42,7 @@ model = genai.GenerativeModel("gemini-1.5-flash",
                               """)
 
 # ui
-st.title("CryAI - Trợ lý AI về Tiền ảo")
+st.markdown("<h1 style='text-align: center;'>CryAI - Ai assistant for Cryptocurrency</h1>", unsafe_allow_html=True)
 st.write("Chào mừng bạn đến với CryAI, trợ lý AI của chúng tôi. Bạn có thể hỏi tôi về các chức năng sau:")
 st.write("- Giới thiệu về tiền ảo")
 st.write("- Giới thiệu các loại tiền ảo phổ biến nhất")
