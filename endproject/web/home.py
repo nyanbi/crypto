@@ -25,6 +25,24 @@ st.markdown(
 )
 st.write(all_coins)
 
+st.title('Leaderboard of All Coin Prices')
+
+# Ensure 'Date' column is in datetime format
+all_coins['Date'] = pd.to_datetime(all_coins['Date'])
+
+# Get the latest date available in the data
+latest_date = all_coins['Date'].max()
+latest_data = all_coins[all_coins['Date'] == latest_date]
+
+# Select relevant columns and sort by Close, High, Low
+leaderboard = latest_data[['Name', 'Close', 'High', 'Low']].copy()
+leaderboard = leaderboard.sort_values(by=['Close', 'High', 'Low'], ascending=[False, False, False])
+
+# Reset index for display
+leaderboard = leaderboard.reset_index(drop=True)
+
+st.dataframe(leaderboard)
+
 st.title('what can we do?')
 st.write('''
 - Predict the price of a coin
