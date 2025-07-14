@@ -38,6 +38,7 @@ model = genai.GenerativeModel("gemini-1.5-flash",
                               1.Gioi thiệu về tiền ảo tu file {adfd}
                               2.Gioi thiệu các loại tiền ảo phổ biến nhất qua tên {asd}
                               3 .Hướng dẫn cách đầu tư vào tiền ảo
+                              4. giới thiệu cách đầu tư vào tiền ảo (vd. tôi có 50000$ tôi nên đầu tư vào coin nào, tôi nên đầu tư bao nhiêu vào mỗi coin)
                               Đối với các câu hỏi ngoài chức năng mà bạn hỗ trợ, trả lời bằng 'Tôi đang không hỗ trợ chức năng này. 
                               """)
 

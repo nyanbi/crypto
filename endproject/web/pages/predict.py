@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import glob
 
-st.title('Predict Coin Price')
+st.markdown("<h1 style='text-align: center;'>Predict Coin Price and Investment Prediction</h1>", unsafe_allow_html=True)
 
 data = '../data/coin_*.csv'
 csv_files = glob.glob(data)
@@ -16,30 +16,27 @@ asd = list(all_coins['Name'])
 asd = list(dict.fromkeys(asd))
 asd.insert(0,'')
 
-a = st.selectbox('Select a coin to predict its price', asd)
-b = st.button('Predict')
-st.write(f'You selected: {a}')
+coin_invest = 0
 
 
-# train model cnn
-if a != '' and b:
-    from sklearn.model_selection import train_test_split
-    X = all_coins[['High', 'Low', 'Open', 'Close', 'Volume', 'Marketcap']].values
-    y = all_coins['Name'].values
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42,stratify=y)
 
-    from tensorflow.keras.models import Sequential
-    from tensorflow.keras.layers import Dense, Conv1D, Flatten
-    from sklearn.preprocessing import LabelEncoder
+from sklearn.model_selection import train_test_split
+X = all_coins[['High', 'Low', 'Open', 'Close', 'Volume', 'Marketcap']].values
+y = all_coins['Name'].values
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42,stratify=y)
+
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Conv1D, Flatten
+from sklearn.preprocessing import LabelEncoder
 
     # Encode labels
-    le = LabelEncoder()
-    y_train_enc = le.fit_transform(y_train)
-    y_test_enc = le.transform(y_test)
-    num_classes = len(le.classes_)
+le = LabelEncoder()
+y_train_enc = le.fit_transform(y_train)
+y_test_enc = le.transform(y_test)
+num_classes = len(le.classes_)
 
     # Build CNN model for classification
-    model = Sequential([
+model = Sequential([
         
         Conv1D(filters=64, kernel_size=2, activation='relu', input_shape=(X_train.shape[1], 1)),
         Flatten(),
@@ -47,7 +44,12 @@ if a != '' and b:
         Dense(num_classes, activation='softmax')
     ])
 
-    model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+model.compile(optimizer='adam', loss='sparse_categorical_crossentropy', metrics=['accuracy'])
+st.title('Train Model first')
+
+c_btn = st.button('Train Model')
+if c_btn:
+    st.write("Training the model, please wait...")
     # model.summary()
     epochs = 10
     batch_size = 32
@@ -67,6 +69,16 @@ if a != '' and b:
             )
     st.success('Model predict completed!')
 
+st.title('Predict Coin Price')
+a = st.selectbox('Select a coin to predict its price', asd)
+coin_input = st.number_input('Enter your investment amount in USD', min_value=0, value=0, step=1000)
+b = st.button('Test')
+st.write(f'You selected: {a}')
+# train model cnn
+if a != '' and b:
+    
+    max_close_prices1 = all_coins.groupby('Name')['Close'].max()
+
     # Filter test samples for the selected coin
     coin_idx = (y_test == a)  # Replace 'AveCoin' with the desired coin name
     X_coin = X_test[coin_idx]
@@ -79,8 +91,8 @@ if a != '' and b:
     # Show the corresponding Close prices for the selected coin test samples
     coin_close_prices = X_coin[:, 3]
     # Convert Close prices to USD format and print
-    coin_close_prices_usd = ["${:,.2f}".format(price) for price in coin_close_prices]
-    st.write(f"Close prices for {a} test samples (USD):", max(coin_close_prices_usd))
+    coin_close_prices_usd = ["{:,.2f}".format(price) for price in coin_close_prices]
+    st.write(f"Close prices for {a} test samples (USD):", "$",max(coin_close_prices_usd))
 
 
     import numpy as np
@@ -109,3 +121,41 @@ if a != '' and b:
     # st.pyplot(fig)
     
     st.line_chart(pd.DataFrame(coin_close_prices, columns=['Close Price']))
+    
+
+    # max_price_predict = float(max(coin_close_prices_usd))
+    max_price_predict = max((price.replace(',', '')) for price in coin_close_prices_usd)
+    max_price_predict = float(max_price_predict)
+
+    coin_invest = max_price_predict
+    
+    # Calculate the max close price for each coin in the dataset
+    max_close_prices = all_coins.groupby('Name')['Close'].max()
+
+    # Display the max close price for the selected coin
+    
+    st.write(f"Max close price for {a}: ${max_close_prices[a]:.2f}")
+    
+    coin_max = max_close_prices[a]
+    
+    coin_amount = coin_input * coin_max
+    st.write("You can buy", coin_amount, "coins of", a, "with your investment amount of $", coin_input)
+    
+    coin_amount_predict = coin_input * coin_invest
+    st.write("You can buy", coin_amount_predict, "coins of", a, "with your predicted investment amount of $", coin_invest , "in the future")
+    
+    
+    earn = coin_amount_predict - coin_amount
+    if earn > 0:
+        st.markdown(f"<span style='color:green; font-size:23px'>You can earn ${earn:.2f} in the future</span>", unsafe_allow_html=True)
+    elif earn < 0:
+        st.markdown(f"<span style='color:red; font-size:23px'>You can lose ${abs(earn):.2f} in the future</span>", unsafe_allow_html=True)
+    else:
+        st.markdown("<span style='color:white; font-size:23px'>You will not earn or lose money in the future</span>", unsafe_allow_html=True)
+# predict if user input a coin name and input thier investment amount how much they can earn
+
+# Calculate the max close price for each coin in the dataset
+# Calculate and display the max close price for the selected coin
+
+# st.write(coin_invest)
+# Set coin_invest1 to the predicted max close price for the selected coin
