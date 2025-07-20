@@ -71,7 +71,7 @@ if c_btn:
 
 st.title('Predict Coin Price')
 a = st.selectbox('Select a coin to predict its price', asd)
-coin_input = st.number_input('Enter your investment amount in USD', min_value=0, value=0, step=1000)
+coin_input = st.number_input('Enter your quantity ', min_value=0, value=0, step=1000)
 b = st.button('Test')
 st.write(f'You selected: {a}')
 # train model cnn
@@ -139,17 +139,19 @@ if a != '' and b:
     coin_max = max_close_prices[a]
     
     coin_amount = coin_input * coin_max
-    st.write("You can buy", coin_amount, "coins of", a, "with your investment amount of $", coin_input)
-    
+    # st.write("You can buy", coin_amount, "coins of", a, "with your investment amount of $", coin_input)
+    st.write(f"With {coin_input} units of {a}, the current total value at the max close price (${coin_max:.2f}) is: ${coin_amount:.2f}")
+
     coin_amount_predict = coin_input * coin_invest
-    st.write("You can buy", coin_amount_predict, "coins of", a, "with your predicted investment amount of $", coin_invest , "in the future")
+    st.write(f"With {coin_input} units of {a}, the predicted future total value at the max close price (${coin_invest:.2f}) is: ${coin_amount_predict:.2f}")
     
     
     earn = coin_amount_predict - coin_amount
-    if earn > 0:
-        st.markdown(f"<span style='color:green; font-size:23px'>You can earn ${earn:.2f} in the future</span>", unsafe_allow_html=True)
-    elif earn < 0:
+    if earn < 0:
         st.markdown(f"<span style='color:red; font-size:23px'>You can lose ${abs(earn):.2f} in the future</span>", unsafe_allow_html=True)
+    elif earn > 0:
+        
+        st.markdown(f"<span style='color:green; font-size:23px'>You can earn ${earn:.2f} in the future</span>", unsafe_allow_html=True)
     else:
         st.markdown("<span style='color:white; font-size:23px'>You will not earn or lose money in the future</span>", unsafe_allow_html=True)
 # predict if user input a coin name and input thier investment amount how much they can earn
